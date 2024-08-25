@@ -55,29 +55,21 @@ const splitMessage = (message: string): string[] => {
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
   try {
-    // Define the XPath for the button
-    const xpath =
+    // Define the XPath for the button's span element
+    const spanXPath =
       "/html/body/div[2]//div/div/div[1]/div/div[2]/div/div[2]/div/button/span";
 
-    // Create a locator for the span element
-    const locator = page.locator(`::-p-xpath(${xpath})`);
+    // Create a locator for the span element using XPath
+    const locator = page.locator(`::-p-xpath(${spanXPath})`);
 
-    // Wait for the locator to be visible and enabled
-    await locator.waitFor({
-      state: "visible", // Ensure the element is visible
-      timeout: 10000, // Timeout in milliseconds
-    });
-
-    // Click on the closest button element of the span
-    const buttonLocator = locator.locator("xpath=.."); // This targets the parent button element
-    await buttonLocator.click();
-
+    // Wait for the element to be visible and click it
+    await locator.wait();
+    await locator.click();
     console.log("Button clicked successfully.");
 
-    // Optionally, wait for a confirmation element or a change in the page
-    // For example, wait for an element that appears after clicking
-    const confirmationXpath = '//div[contains(text(), "Confirmation Text")]'; // Update with actual confirmation text
-    await page.waitForXPath(confirmationXpath, { timeout: 5000 });
+    // Optionally wait for a confirmation or another element
+    const confirmationXPath = '//div[contains(text(), "Confirmation Text")]'; // Update as needed
+    await page.locator(`::-p-xpath(${confirmationXPath})`).wait();
 
     console.log("Terms & Conditions accepted.");
   } catch (error) {
@@ -88,7 +80,6 @@ const agreeWithTermsandConditions = async (page: Page) => {
     console.error("Stack trace:", (error as Error).stack);
   }
 };
-
 // scrape SReality
 async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
