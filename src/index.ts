@@ -2,6 +2,7 @@ import "dotenv/config";
 import TelegramBot from "node-telegram-bot-api";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { promises as fsPromises } from "fs";
+import { exit } from "process";
 
 const jsonFilePath = "data.json";
 
@@ -215,6 +216,7 @@ const main = async () => {
     console.log("Combined Data:", newData);
   } catch {
     console.log("error -> main");
+    return;
   }
 };
 
