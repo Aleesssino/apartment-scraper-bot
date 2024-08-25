@@ -170,7 +170,6 @@ const main = async () => {
 
     agreeWithTermsandConditions(page);
 
-    //ss
     const srealityArticles = await extractSRealityArticles(page);
 
     sleep(3000);
