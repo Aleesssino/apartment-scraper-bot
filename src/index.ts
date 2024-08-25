@@ -54,12 +54,39 @@ const splitMessage = (message: string): string[] => {
 
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Enter");
-  console.log("Button clicked successfully.");
+  try {
+    // Define the XPath for the button
+    const xpath =
+      "/html/body/div[2]//div/div/div[1]/div/div[2]/div/div[2]/div/button/span";
+
+    // Create a locator for the span element
+    const locator = page.locator(`::-p-xpath(${xpath})`);
+
+    // Wait for the locator to be visible and enabled
+    await locator.waitFor({
+      state: "visible", // Ensure the element is visible
+      timeout: 10000, // Timeout in milliseconds
+    });
+
+    // Click on the closest button element of the span
+    const buttonLocator = locator.locator("xpath=.."); // This targets the parent button element
+    await buttonLocator.click();
+
+    console.log("Button clicked successfully.");
+
+    // Optionally, wait for a confirmation element or a change in the page
+    // For example, wait for an element that appears after clicking
+    const confirmationXpath = '//div[contains(text(), "Confirmation Text")]'; // Update with actual confirmation text
+    await page.waitForXPath(confirmationXpath, { timeout: 5000 });
+
+    console.log("Terms & Conditions accepted.");
+  } catch (error) {
+    console.error(
+      "Error clicking the button to agree with Terms & Conditions:",
+      (error as Error).message,
+    );
+    console.error("Stack trace:", (error as Error).stack);
+  }
 };
 
 // scrape SReality
