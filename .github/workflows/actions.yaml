@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "*/4 * * * *" # Runs every 6 minutes
+    - cron: "*/4 * * * *" # Runs every 4 minutes
 
 jobs:
   build:
@@ -20,13 +20,16 @@ jobs:
         with:
           node-version: "16"
 
-      - name: Cache Puppeteer Browser
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Cache pnpm store
         uses: actions/cache@v3
         with:
-          path: ~/.cache/puppeteer
-          key: ${{ runner.os }}-puppeteer-${{ hashFiles('package-lock.json') }}
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-puppeteer-
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install system dependencies
         run: |
@@ -72,16 +75,16 @@ jobs:
             wget
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Compile TypeScript
-        run: npm run build
+        run: pnpm run build
 
       - name: Run scraper
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node dist/index.js
+        run: pnpm run start # Assuming your start script is defined in package.json
 
       - name: Check for changes
         id: check_changes
