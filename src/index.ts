@@ -55,32 +55,8 @@ const splitMessage = (message: string): string[] => {
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
   sleep(8000);
-
-  try {
-    // Define the XPath for the span element containing the text
-    const spanXPath = '//span[contains(text(), "Souhlasím a pokračovat")]';
-
-    // Create a locator for the span element using XPath
-    const locator = page.locator(`::-p-xpath(${spanXPath})`);
-
-    // Wait for the element to be visible and click it
-    await locator.wait();
-    await locator.click();
-    console.log("Button clicked successfully.");
-
-    // Optionally wait for a confirmation or another element
-    // Adjust this part based on your needs
-    const confirmationXPath = '//div[contains(text(), "Confirmation Text")]'; // Update as needed
-    await page.locator(`::-p-xpath(${confirmationXPath})`).wait();
-
-    console.log("Terms & Conditions accepted.");
-  } catch (error) {
-    console.error(
-      "Error clicking the button to agree with Terms & Conditions:",
-      (error as Error).message,
-    );
-    console.error("Stack trace:", (error as Error).stack);
-  }
+  const buttonLocator = page.locator('::-p-text("Souhlasím a pokračovat")');
+  await buttonLocator.click();
 };
 
 // scrape SReality
