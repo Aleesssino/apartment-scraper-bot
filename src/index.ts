@@ -54,9 +54,16 @@ const splitMessage = (message: string): string[] => {
 
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
-  sleep(8000);
-  const buttonLocator = page.locator('::-p-text("Souhlasím a pokračovat")');
-  await buttonLocator.click();
+  console.log("Waiting for 10 seconds...");
+  await sleep(10000); // Increase sleep time to ensure everything is loaded
+  console.log("Pressing Tab...");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  console.log("Pressing Enter...");
+  await page.keyboard.press("Enter");
+  console.log("Button clicked successfully.");
 };
 
 // scrape SReality
