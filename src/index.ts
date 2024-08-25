@@ -215,7 +215,7 @@ const main = async () => {
     }, 150000);
     console.log("Combined Data:", newData);
   } catch {
-    console.log("error -> main");
+    console.log(Error);
     return;
   }
 };
