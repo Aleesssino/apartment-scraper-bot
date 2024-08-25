@@ -2,6 +2,7 @@ import "dotenv/config";
 import TelegramBot from "node-telegram-bot-api";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { promises as fsPromises } from "fs";
+
 const jsonFilePath = "data.json";
 
 const token = process.env.TELEGRAM_TOKEN as string;
@@ -155,11 +156,10 @@ const writeJsonFile = async (
 //
 const main = async () => {
   const sreality =
-    "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%20kk,4%20kk,4%201,5%20kk&stari=mesic&cena-od=0&cena-do=40000";
+    "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=mesic&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
-      // change to true in prod !!
-      headless: false,
+      headless: true,
       defaultViewport: null,
     });
     const page = await browser.newPage();
@@ -172,14 +172,12 @@ const main = async () => {
     //ss
     const srealityArticles = await extractSRealityArticles(page);
 
+    sleep(3000);
+
     const idnes =
-      "https://reality.idnes.cz/s/pronajem/byty/do-40000-za-mesic/brno-mesto/?s-qc%5BsubtypeFlat%5D%5B0%5D=3k&s-qc%5BsubtypeFlat%5D%5B1%5D=31&s-qc%5BsubtypeFlat%5D%5B2%5D=4k&s-qc%5BsubtypeFlat%5D%5B3%5D=41&s-qc%5BsubtypeFlat%5D%5B4%5D=5k&s-qc%5BsubtypeFlat%5D%5B5%5D=51&s-qc%5BsubtypeFlat%5D%5B6%5D=6k&s-qc%5BarticleAge%5D=7";
+      "https://reality.idnes.cz/s/pronajem/byty/do-40000-za-mesic/brno/?s-qc%5BsubtypeFlat%5D%5B0%5D=3k&s-qc%5BsubtypeFlat%5D%5B1%5D=31&s-qc%5BsubtypeFlat%5D%5B2%5D=4k&s-qc%5BsubtypeFlat%5D%5B3%5D=41&s-qc%5BsubtypeFlat%5D%5B4%5D=5k&s-qc%5BsubtypeFlat%5D%5B5%5D=51&s-qc%5BarticleAge%5D=7";
 
     await page.goto(idnes, { waitUntil: "networkidle2" });
-
-    setTimeout(() => {
-      10000;
-    });
 
     const idnesArticles = await extractIDnesArticles(page);
 
