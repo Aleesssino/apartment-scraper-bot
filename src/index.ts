@@ -54,7 +54,6 @@ const splitMessage = (message: string): string[] => {
 
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
-  sleep(3000);
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
