@@ -1,26 +1,58 @@
-console.log("give me some sweet scrapes");
-
 import "dotenv/config";
 import TelegramBot from "node-telegram-bot-api";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { promises as fsPromises } from "fs";
+const jsonFilePath = "data.json";
 
 const token = process.env.TELEGRAM_TOKEN as string;
 const chatId = process.env.TELEGRAM_CHAT_ID as string;
 
-const bot = new TelegramBot(token);
+const bot = new TelegramBot(token, { polling: true });
+const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-//sendMessage("We rollin!");
-const sendMessage = async (message: string) => {
+interface Article {
+  title: string;
+  link: string;
+  sent: boolean;
+}
+
+// send JSON data
+const sendJsonData = async (
+  bot: TelegramBot,
+  data: Article[],
+): Promise<void> => {
   try {
-    await bot.sendMessage(chatId, message);
-    console.log("Message sent successfully");
+    const message = `SReality && IDnes data:\n\n${JSON.stringify(data, null, 2)}`;
+    const messages = splitMessage(message);
+
+    for (const msg of messages) {
+      await bot.sendMessage(chatId, msg);
+    }
+
+    console.log(`JSON data sent to chat ID ${chatId} successfully.`);
   } catch (error) {
-    console.error("Error sending message:", error);
+    console.error("Error sending JSON data:", error);
   }
+};
+
+const splitMessage = (message: string): string[] => {
+  const MAX_MESSAGE_LENGTH = 4096;
+  const messages: string[] = [];
+
+  while (message.length > MAX_MESSAGE_LENGTH) {
+    let splitIndex = message.lastIndexOf(" ", MAX_MESSAGE_LENGTH);
+    if (splitIndex === -1) splitIndex = MAX_MESSAGE_LENGTH;
+    messages.push(message.substring(0, splitIndex));
+    message = message.substring(splitIndex).trim();
+  }
+
+  if (message) messages.push(message);
+  return messages;
 };
 
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
+  sleep(3000);
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Tab");
@@ -29,9 +61,8 @@ const agreeWithTermsandConditions = async (page: Page) => {
   console.log("Button clicked successfully.");
 };
 
-//
-
-async function extractAndLogArticles(page: Page) {
+// scrape SReality
+async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
   const XpS =
     "::-p-xpath(//html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div/div/div/span/h2/a)";
@@ -48,19 +79,20 @@ async function extractAndLogArticles(page: Page) {
       XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
       null,
     );
-    const articleData: { title: string; link: string }[] = [];
+    const articleData: Article[] = [];
     for (let i = 0; i < xpathResult.snapshotLength; i++) {
       const item = xpathResult.snapshotItem(i) as HTMLAnchorElement;
       articleData.push({
         title: item.textContent?.trim() || "",
         link: item.href,
+        sent: false,
       });
     }
     return articleData;
   }, XpS);
 
-  // Log the array of articles with titles and links
   console.log("Array of Articles:", SrealityArticles);
+  return SrealityArticles;
 }
 
 async function extractIDnesArticles(page: Page) {
@@ -79,29 +111,53 @@ async function extractIDnesArticles(page: Page) {
       XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
       null,
     );
-    const articleData: { title: string; link: string }[] = [];
+    const articleData: Article[] = [];
     for (let i = 0; i < xpathResult.snapshotLength; i++) {
       const item = xpathResult.snapshotItem(i) as HTMLAnchorElement;
       const titleElement = item.querySelector("div > h2") as HTMLElement;
       articleData.push({
         title: titleElement?.textContent?.trim() || "",
         link: item.href,
+        sent: false,
       });
     }
     return articleData;
   }, XpId);
 
-  // Log the array of articles with titles and links
   console.log("Array of Articles from Idnes:", idnesArticles);
+  return idnesArticles;
 }
 
-// scrape data
-const scrapeNewOffers = async () => {
+// Function to read JSON data from file
+const readJsonFile = async (filePath: string): Promise<Article[]> => {
+  try {
+    const data = await fsPromises.readFile(filePath, "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Error reading JSON file:", error);
+    return [];
+  }
+};
+
+// Function to write JSON data to file
+const writeJsonFile = async (
+  filePath: string,
+  data: Article[],
+): Promise<void> => {
+  try {
+    await fsPromises.writeFile(filePath, JSON.stringify(data, null, 2));
+    console.log("Successfully saved JSON");
+  } catch (error) {
+    console.error("Error saving JSON file:", error);
+  }
+};
+
+//
+const main = async () => {
   const sreality =
     "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%20kk,4%20kk,4%201,5%20kk&stari=mesic&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
-  TODO change
       // change to true in prod !!
       headless: false,
       defaultViewport: null,
@@ -112,11 +168,9 @@ const scrapeNewOffers = async () => {
     await page.goto(sreality, { waitUntil: "networkidle2" });
 
     agreeWithTermsandConditions(page);
-    setTimeout(() => {
-      10000;
-    });
+
     //ss
-    await extractAndLogArticles(page);
+    const srealityArticles = await extractSRealityArticles(page);
 
     const idnes =
       "https://reality.idnes.cz/s/pronajem/byty/do-40000-za-mesic/brno-mesto/?s-qc%5BsubtypeFlat%5D%5B0%5D=3k&s-qc%5BsubtypeFlat%5D%5B1%5D=31&s-qc%5BsubtypeFlat%5D%5B2%5D=4k&s-qc%5BsubtypeFlat%5D%5B3%5D=41&s-qc%5BsubtypeFlat%5D%5B4%5D=5k&s-qc%5BsubtypeFlat%5D%5B5%5D=51&s-qc%5BsubtypeFlat%5D%5B6%5D=6k&s-qc%5BarticleAge%5D=7";
@@ -126,10 +180,44 @@ const scrapeNewOffers = async () => {
     setTimeout(() => {
       10000;
     });
-    extractIDnesArticles(page);
+
+    const idnesArticles = await extractIDnesArticles(page);
+
+    await browser.close();
+
+    // Combine the data into one array
+    const newData = [...srealityArticles, ...idnesArticles];
+
+    const currentData = await readJsonFile(jsonFilePath);
+
+    // Find new items that haven't been sent yet
+    const newItems = newData.filter(
+      (item) =>
+        !currentData.some(
+          (existingItem) =>
+            existingItem.link === item.link && existingItem.sent,
+        ),
+    );
+
+    if (newItems.length > 0) {
+      await sendJsonData(bot, newItems);
+
+      // Mark items as sent and update JSON file
+      const updatedData = [
+        ...currentData,
+        ...newItems.map((item) => ({ ...item, sent: true })),
+      ];
+      await writeJsonFile(jsonFilePath, updatedData);
+    }
+
+    setTimeout(() => {
+      console.log("Exiting program...");
+      process.exit(0);
+    }, 150000);
+    console.log("Combined Data:", newData);
   } catch {
-    console.log("error");
+    console.log("error -> main");
   }
 };
 
-scrapeNewOffers();
+main();
