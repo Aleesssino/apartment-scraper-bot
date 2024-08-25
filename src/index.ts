@@ -54,10 +54,11 @@ const splitMessage = (message: string): string[] => {
 
 // agree with terms&conditions
 const agreeWithTermsandConditions = async (page: Page) => {
+  sleep(8000);
+
   try {
-    // Define the XPath for the button's span element
-    const spanXPath =
-      "/html/body/div[2]//div/div/div[1]/div/div[2]/div/div[2]/div/button/span";
+    // Define the XPath for the span element containing the text
+    const spanXPath = '//span[contains(text(), "Souhlasím a pokračovat")]';
 
     // Create a locator for the span element using XPath
     const locator = page.locator(`::-p-xpath(${spanXPath})`);
@@ -68,6 +69,7 @@ const agreeWithTermsandConditions = async (page: Page) => {
     console.log("Button clicked successfully.");
 
     // Optionally wait for a confirmation or another element
+    // Adjust this part based on your needs
     const confirmationXPath = '//div[contains(text(), "Confirmation Text")]'; // Update as needed
     await page.locator(`::-p-xpath(${confirmationXPath})`).wait();
 
@@ -80,6 +82,7 @@ const agreeWithTermsandConditions = async (page: Page) => {
     console.error("Stack trace:", (error as Error).stack);
   }
 };
+
 // scrape SReality
 async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
