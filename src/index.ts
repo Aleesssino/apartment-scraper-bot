@@ -95,7 +95,7 @@ async function extractSRealityArticles(page: Page) {
     return articleData;
   }, XpS);
 
-  console.log("Array of Articles:", SrealityArticles);
+  console.log("Array of S-Articles:", SrealityArticles);
   return SrealityArticles;
 }
 
