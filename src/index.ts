@@ -159,7 +159,7 @@ const writeJsonFile = async (
 //
 const main = async () => {
   const sreality =
-    "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=mesic&cena-od=0&cena-do=40000";
+    "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=tyden&plocha-od=70&plocha-do=10000000000&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
       headless: true,
