@@ -20,8 +20,8 @@ It uses GitHub Actions to automate the process, which runs multiple times an hou
         v
 +---------------+        +----------------+
 | Scrape        |        | Combine &      |
-| SReality &    |        | Compare with   |
-| IDnes         | ------>| `data.json`    |
+| SReality &    | -----> | Compare with   |
+| IDnes         |        | `data.json`    |
 +---------------+        +----------------+
         |                        |
         v                        v
