@@ -60,6 +60,19 @@ const agreeWithTermsandConditions = async (page: Page) => {
   console.log("Pressing Enter...");
   await page.keyboard.press("Enter");
   console.log("Button clicked successfully.");
+  await sleep(10000);
+
+  console.log("Preferences -> gimmick");
+  for (let i = 0; i < 2; i++) {
+    await page.keyboard.down("Shift");
+    await page.keyboard.press("Tab");
+    await page.keyboard.up("Shift");
+    await sleep(1000);
+    console.log(`Pressing Shift + Tab... (i: ${i + 1})`);
+  }
+
+  console.log("Pressing Enter...");
+  await page.keyboard.press("Enter");
 };
 
 // scrape SReality
@@ -67,7 +80,6 @@ async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
   const XpS =
     "::-p-xpath(//html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div/div/div/span/h2/a)";
-
   // Wait for the article elements to be present in the DOM
   await page.waitForSelector(XpS);
 
@@ -153,13 +165,12 @@ const writeJsonFile = async (
   }
 };
 
-//
 const main = async () => {
   const sreality =
     "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=tyden&plocha-od=70&plocha-do=10000000000&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
-      headless: true,
+      headless: true, // false in testing&debugging
       defaultViewport: null,
     });
     const page = await browser.newPage();

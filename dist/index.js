@@ -58,14 +58,27 @@ const agreeWithTermsandConditions = (page) => __awaiter(void 0, void 0, void 0, 
     console.log("Pressing Enter...");
     yield page.keyboard.press("Enter");
     console.log("Button clicked successfully.");
+    yield sleep(10000);
+    console.log("Preferences -> gimmick");
+    for (let i = 0; i < 2; i++) {
+        yield page.keyboard.down("Shift"); // Hold down the Shift key
+        yield page.keyboard.press("Tab"); // Press the Tab key
+        yield page.keyboard.up("Shift");
+        yield sleep(1000);
+        console.log(`Pressing Shift + Tab... (iteration: ${i + 1})`);
+    }
+    console.log("Pressing Enter...");
+    yield page.keyboard.press("Enter");
 });
 // scrape SReality
 function extractSRealityArticles(page) {
     return __awaiter(this, void 0, void 0, function* () {
         // Define the XPath for the articles using Puppeteer's built-in XPath selector
         const XpS = "::-p-xpath(//html/body/div[2]/div[1]/div[2]/div[3]/div[3]/div/div/div/div/div[3]/div/div/div/div/span/h2/a)";
+        console.log("launch page");
         // Wait for the article elements to be present in the DOM
         yield page.waitForSelector(XpS);
+        console.log("xps");
         // Extract the title and link of the articles
         const SrealityArticles = yield page.evaluate((XpS) => {
             var _a;
