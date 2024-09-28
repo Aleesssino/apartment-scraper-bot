@@ -60,7 +60,9 @@ const agreeWithTermsandConditions = async (page: Page) => {
   console.log("Pressing Enter...");
   await page.keyboard.press("Enter");
   console.log("Button clicked successfully.");
-  await sleep(10000);
+
+  // If there is another Preferences pop-up
+  await sleep(180000);
 
   console.log("Preferences -> gimmick");
   for (let i = 0; i < 2; i++) {
