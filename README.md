@@ -37,7 +37,9 @@ It uses GitHub Actions to automate the process, which runs multiple times an hou
 +---------------+
 ```
 
-## <details><summary>License</summary>
+## License
+
+<details>
 
 ```
 
