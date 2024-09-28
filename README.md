@@ -39,7 +39,7 @@ It uses GitHub Actions to automate the process, which runs multiple times an hou
 
 ## License
 
-<details>
+<details><summary>WTFPL</summary>
 
 ```
 
