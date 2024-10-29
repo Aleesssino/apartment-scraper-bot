@@ -77,6 +77,14 @@ const agreeWithTermsandConditions = async (page: Page) => {
   // await page.keyboard.press("Enter");
 };
 
+// Function to check if an articel should be excluded -> anti Ads function
+function shouldExcludeArticle(title: string, link: string): boolean {
+  const titlePattern = /^\.css-/;
+  const linkPattern = /makleri/;
+
+  return titlePattern.test(title) || linkPattern.test(link);
+}
+
 // scrape SReality
 async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
