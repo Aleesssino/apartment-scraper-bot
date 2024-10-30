@@ -78,11 +78,10 @@ const agreeWithTermsandConditions = async (page: Page) => {
 };
 
 // Function to check if an articel should be excluded -> anti Ads function
-function shouldExcludeArticle(title: string, link: string): boolean {
-  const titlePattern = /^\.css-/;
+function shouldExcludeArticle(link: string): boolean {
   const linkPattern = /makleri/;
 
-  return titlePattern.test(title) || linkPattern.test(link);
+  return linkPattern.test(link);
 }
 
 // scrape SReality
@@ -105,11 +104,14 @@ async function extractSRealityArticles(page: Page) {
     const articleData: Article[] = [];
     for (let i = 0; i < xpathResult.snapshotLength; i++) {
       const item = xpathResult.snapshotItem(i) as HTMLAnchorElement;
-      articleData.push({
-        title: item.textContent?.trim() || "",
-        link: item.href,
-        sent: false,
-      });
+
+      if (!shouldExcludeArticle(item.href)) {
+        articleData.push({
+          title: item.innerText?.trim() || "",
+          link: item.href,
+          sent: false,
+        });
+      }
     }
     return articleData;
   }, XpS);
@@ -180,7 +182,7 @@ const main = async () => {
     "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=tyden&plocha-od=70&plocha-do=10000000000&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
-      headless: true, // false in testing&debugging
+      headless: false, // false in testing&debugging
       defaultViewport: null,
     });
     const page = await browser.newPage();
