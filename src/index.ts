@@ -77,13 +77,6 @@ const agreeWithTermsandConditions = async (page: Page) => {
   // await page.keyboard.press("Enter");
 };
 
-// Function to check if an articel should be excluded -> anti Ads function
-function shouldExcludeArticle(link: string): boolean {
-  const linkPattern = /makleri/;
-
-  return linkPattern.test(link);
-}
-
 // scrape SReality
 async function extractSRealityArticles(page: Page) {
   // Define the XPath for the articles using Puppeteer's built-in XPath selector
@@ -94,6 +87,9 @@ async function extractSRealityArticles(page: Page) {
 
   // Extract the title and link of the articles
   const SrealityArticles = await page.evaluate((XpS) => {
+    // Anti ads pattern - exclude links with "makleri/"
+    const linkPattern = /makleri/i;
+
     const xpathResult = document.evaluate(
       "//*/div[1]/div/div[2]/div[1]/div[4]/ul/li/a",
       document,
@@ -105,9 +101,9 @@ async function extractSRealityArticles(page: Page) {
     for (let i = 0; i < xpathResult.snapshotLength; i++) {
       const item = xpathResult.snapshotItem(i) as HTMLAnchorElement;
 
-      if (!shouldExcludeArticle(item.href)) {
+      if (!linkPattern.test(item.href)) {
         articleData.push({
-          title: item.innerText?.trim() || "",
+          title: item.innerText?.replace(/\n/g, "  ").trim() || "",
           link: item.href,
           sent: false,
         });
@@ -141,7 +137,7 @@ async function extractIDnesArticles(page: Page) {
       const item = xpathResult.snapshotItem(i) as HTMLAnchorElement;
       const titleElement = item.querySelector("div > h2") as HTMLElement;
       articleData.push({
-        title: titleElement?.textContent?.trim() || "",
+        title: titleElement?.textContent?.replace(/\n/g, "  ").trim() || "",
         link: item.href,
         sent: false,
       });
@@ -182,7 +178,7 @@ const main = async () => {
     "https://www.sreality.cz/hledani/pronajem/byty/brno?velikost=3%2Bkk,4%2Bkk,4%2B1,5%2Bkk,3%2B1,5%2B1&stari=tyden&plocha-od=70&plocha-do=10000000000&cena-od=0&cena-do=40000";
   try {
     const browser: Browser = await puppeteer.launch({
-      headless: false, // false in testing&debugging
+      headless: true, // false in testing&debugging
       defaultViewport: null,
     });
     const page = await browser.newPage();
