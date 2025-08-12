@@ -1,4 +1,4 @@
-# apartment-scraper-bot
+# Apartment Scraper Bot
 
 ### Scraper & Telegram Bot
 
