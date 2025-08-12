@@ -1,4 +1,4 @@
-# relitySecondBot-ts
+# apartment-scraper-bot
 
 ### Scraper & Telegram Bot
 
